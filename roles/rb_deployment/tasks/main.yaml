@@ -1,0 +1,52 @@
+- name: Check if /opt/rb directory exists
+  stat:
+    path: /opt/rb
+  register: rb_dir
+
+- name: Teardown existing Docker Compose stack
+  community.docker.docker_compose_v2:
+    project_src: /opt/rb
+    files:
+      - docker-compose.yml
+    state: absent
+  when: rb_dir.stat.exists
+
+- name: Create /opt/rb directory
+  become: true
+  file:
+    path: "/opt/rb"
+    state: directory
+    mode: "0755"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+
+- name: Sync project files
+  ansible.posix.synchronize:
+    src: "../../../{{ item }}"
+    dest: "/opt/rb/"
+  loop:
+    - agent.py
+    - bot.py
+    - db.py
+    - embedding.py
+    - main.py
+    - models.py
+    - pdf.py
+    - settings.py
+    - pyproject.toml
+    - uv.lock
+    - alembic.ini
+    - entrypoint.sh
+    - Dockerfile
+    - docker-compose.yml
+    - .dockerignore
+    - migrations
+    - .env
+
+- name: Deploy RecettesBot with Docker Compose
+  community.docker.docker_compose_v2:
+    project_src: "/opt/rb"
+    files:
+      - docker-compose.yml
+    build: always
+    state: present

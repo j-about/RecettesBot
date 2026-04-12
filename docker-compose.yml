@@ -1,0 +1,48 @@
+services:
+  db:
+    image: pgvector/pgvector:0.8.2-pg18-trixie
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    expose:
+      - "5432"
+    volumes:
+      # Postgres 18+ stores cluster data under a major-version subdirectory of
+      # /var/lib/postgresql; mount the parent so pg_upgrade --link can work
+      # cleanly across major versions.
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  bot:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      DATABASE_URL_SYNC: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      EMBEDDING_MODEL_NAME: ${EMBEDDING_MODEL_NAME:-}
+      SEARCH_DISTANCE_THRESHOLD: ${SEARCH_DISTANCE_THRESHOLD:-}
+      SEARCH_RESULT_LIMIT: ${SEARCH_RESULT_LIMIT:-}
+      AGENT_TIMEOUT_SECONDS: ${AGENT_TIMEOUT_SECONDS:-}
+      LOGFIRE_TOKEN: ${LOGFIRE_TOKEN:-}
+      ALLOWED_USER_IDS: ${ALLOWED_USER_IDS:-}
+      ALLOWED_GROUP_IDS: ${ALLOWED_GROUP_IDS:-}
+      ALLOWED_CHANNEL_IDS: ${ALLOWED_CHANNEL_IDS:-}
+      LOGFIRE_IGNORE_NO_CONFIG: "1"
+    volumes:
+      - hf_cache:/opt/hf-cache
+      # Mount Claude Code credentials (fallback when ANTHROPIC_API_KEY is unset):
+      # - ~/.claude/.credentials.json:/mnt/claude-credentials/.credentials.json:ro
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  hf_cache:
