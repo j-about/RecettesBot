@@ -9,7 +9,7 @@ REQUIRED_ENV = {
 
 DATABASE_ENV = {
     "DATABASE_URL": "postgresql+asyncpg://testuser:testpass@dbhost:5432/testdb",
-    "DATABASE_URL_SYNC": "postgresql+psycopg2://testuser:testpass@dbhost:5432/testdb",
+    "DATABASE_URL_SYNC": "postgresql+psycopg://testuser:testpass@dbhost:5432/testdb",
 }
 
 OPTIONAL_DEFAULTS = {
@@ -45,7 +45,7 @@ def test_settings_loads_from_env(isolated_env: pytest.MonkeyPatch) -> None:
     s = Settings()
     assert s.telegram_bot_token == REQUIRED_ENV["TELEGRAM_BOT_TOKEN"]
     assert s.database_url == "postgresql+asyncpg://testuser:testpass@dbhost:5432/testdb"
-    assert s.database_url_sync == "postgresql+psycopg2://testuser:testpass@dbhost:5432/testdb"
+    assert s.database_url_sync == "postgresql+psycopg://testuser:testpass@dbhost:5432/testdb"
     # Verify default values for optional settings.
     assert s.embedding_model_name == "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
     assert s.search_distance_threshold == 0.65

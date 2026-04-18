@@ -1,7 +1,7 @@
 """Async database engine and session factory.
 
 Runtime code uses an async engine on top of asyncpg. Alembic uses the sync
-URL + psycopg2 from its own ``migrations/env.py`` — keep them separate.
+URL + psycopg (v3) from its own ``migrations/env.py`` — keep them separate.
 
 Note on pgvector + asyncpg: ``pgvector.asyncpg.register_vector`` installs a
 **binary** codec on the asyncpg connection, but ``pgvector.sqlalchemy.VECTOR``

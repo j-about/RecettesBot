@@ -19,7 +19,7 @@ from settings import get_settings
 def _base_env(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "test-token-123")
     monkeypatch.setenv("DATABASE_URL", "postgresql+asyncpg://x:x@db:5432/y")
-    monkeypatch.setenv("DATABASE_URL_SYNC", "postgresql+psycopg2://x:x@db:5432/y")
+    monkeypatch.setenv("DATABASE_URL_SYNC", "postgresql+psycopg://x:x@db:5432/y")
     get_settings.cache_clear()
     yield
     get_settings.cache_clear()

@@ -1,8 +1,8 @@
 """Alembic environment.
 
-Alembic runs synchronously via psycopg2 against ``DATABASE_URL_SYNC``. The async
-runtime engine in ``db.py`` is intentionally not used here — Alembic's migration
-runner expects a sync DBAPI.
+Alembic runs synchronously via psycopg (v3) against ``DATABASE_URL_SYNC``. The
+async runtime engine in ``db.py`` is intentionally not used here — Alembic's
+migration runner expects a sync DBAPI.
 
 Three pgvector hooks are wired into this module:
 

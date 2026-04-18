@@ -50,18 +50,20 @@ A Telegram bot that saves recipes from any URL, searches them with AI-powered se
 | Layer | Technology |
 |-------|-----------|
 | Bot framework | python-telegram-bot 22.7 (polling) |
-| AI extraction | Claude Agent SDK 0.1.58 |
-| Embeddings | sentence-transformers (paraphrase-multilingual-mpnet-base-v2, 768-dim) |
+| AI extraction | Claude Agent SDK 0.1.62 |
+| Embeddings | sentence-transformers 5.4.1 (paraphrase-multilingual-mpnet-base-v2, 768-dim) |
 | Tensor backend | PyTorch 2.11.0 (CPU-only build via `pytorch-cpu` uv index) |
 | ORM | SQLModel 0.0.38 (SQLAlchemy + Pydantic) |
 | Database | PostgreSQL 18 + pgvector 0.4.2 |
+| Async DB driver | asyncpg 0.31.0 (runtime) |
+| Sync DB driver | psycopg 3.3.3 (Alembic migrations) |
 | Migrations | Alembic 1.18.4 |
 | PDF generation | fpdf2 2.8.7 |
-| Observability | Logfire 4.31.1 |
+| Observability | Logfire 4.32.1 |
 | Settings | pydantic-settings 2.13.1 |
 | Package manager | uv |
-| Linting | Ruff 0.15.10 |
-| Type checking | ty 0.0.29 |
+| Linting | Ruff 0.15.11 |
+| Type checking | ty 0.0.31 |
 | Testing | pytest 9.0.3 + pytest-asyncio |
 
 ---
