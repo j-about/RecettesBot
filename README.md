@@ -217,10 +217,10 @@ An Ansible playbook is provided for remote deployment.
 # Set deployment target in .env
 # HOST_IP, HOST_USER, HOST_SSH_PRIVATE_KEY_FILE
 
-ansible-playbook playbooks/rb_deployment.yaml
+ansible-playbook playbooks/recettesbot_deployment.yaml
 ```
 
-The playbook syncs the project to `/opt/rb` on the target host and runs `docker compose up --build`.
+The playbook syncs the project to `/opt/recettesbot` on the target host and runs `docker compose up --build`.
 
 ---
 

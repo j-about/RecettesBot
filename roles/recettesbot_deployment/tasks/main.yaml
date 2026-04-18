@@ -1,20 +1,20 @@
-- name: Check if /opt/rb directory exists
+- name: Check if /opt/recettesbot directory exists
   stat:
-    path: /opt/rb
-  register: rb_dir
+    path: /opt/recettesbot
+  register: recettesbot_dir
 
 - name: Teardown existing Docker Compose stack
   community.docker.docker_compose_v2:
-    project_src: /opt/rb
+    project_src: /opt/recettesbot
     files:
       - docker-compose.yml
     state: absent
-  when: rb_dir.stat.exists
+  when: recettesbot_dir.stat.exists
 
-- name: Create /opt/rb directory
+- name: Create /opt/recettesbot directory
   become: true
   file:
-    path: "/opt/rb"
+    path: "/opt/recettesbot"
     state: directory
     mode: "0755"
     owner: "{{ ansible_user }}"
@@ -23,7 +23,7 @@
 - name: Sync project files
   ansible.posix.synchronize:
     src: "../../../{{ item }}"
-    dest: "/opt/rb/"
+    dest: "/opt/recettesbot/"
   loop:
     - agent.py
     - bot.py
@@ -45,7 +45,7 @@
 
 - name: Deploy RecettesBot with Docker Compose
   community.docker.docker_compose_v2:
-    project_src: "/opt/rb"
+    project_src: "/opt/recettesbot"
     files:
       - docker-compose.yml
     build: always
