@@ -18,6 +18,7 @@ dependencies = [
     "python-telegram-bot==22.7",
     "sentence-transformers==5.4.0",
     "sqlmodel==0.0.38",
+    "torch==2.11.0",
 ]
 
 [dependency-groups]
@@ -28,6 +29,14 @@ dev = [
     "ruff==0.15.10",
     "ty==0.0.29",
 ]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu" }]
 
 [tool.ruff]
 line-length = 100

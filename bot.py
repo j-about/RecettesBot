@@ -30,7 +30,15 @@ from typing import Any
 import logfire
 from sqlalchemy.exc import SQLAlchemyError
 from sqlmodel import select
-from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram import (
+    Bot,
+    BotCommand,
+    BotCommandScopeAllGroupChats,
+    BotCommandScopeAllPrivateChats,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    Update,
+)
 from telegram.error import NetworkError as TelegramNetworkError
 from telegram.ext import (
     Application,
@@ -874,6 +882,30 @@ async def _access_control_gate(update: Update, context: ContextTypes.DEFAULT_TYP
 # --- application factory and entry point ----------------------------------
 
 
+# Source of truth for the Telegram "/" command menu. Pushed to the server in
+# :func:`_post_init` under both the private-chat and group-chat scopes so the
+# menu is populated wherever the bot is used. French descriptions match the
+# French command names and the module docstring.
+_BOT_COMMANDS: tuple[BotCommand, ...] = (
+    BotCommand("ajouter", "Ajouter une recette depuis une URL"),
+    BotCommand("chercher", "Rechercher une recette"),
+    BotCommand("personnes", "Ajuster le nombre de personnes"),
+    BotCommand("courses", "Générer la liste de courses"),
+    BotCommand("annuler", "Annuler l'action en cours"),
+)
+
+
+async def _post_init(application: Application) -> None:
+    """Register the command menu in both private and group chats.
+
+    Called once after ``Application`` initialization and before polling starts.
+    The menu is server-side state, so two explicit scopes are set rather than
+    relying on ``BotCommandScopeDefault``.
+    """
+    await application.bot.set_my_commands(_BOT_COMMANDS, scope=BotCommandScopeAllPrivateChats())
+    await application.bot.set_my_commands(_BOT_COMMANDS, scope=BotCommandScopeAllGroupChats())
+
+
 def build_application() -> Application:
     """Build the python-telegram-bot ``Application`` with all handlers registered.
 
@@ -881,7 +913,7 @@ def build_application() -> Application:
     handlers without spawning a network loop.
     """
     settings = get_settings()
-    app = Application.builder().token(settings.telegram_bot_token).build()
+    app = Application.builder().token(settings.telegram_bot_token).post_init(_post_init).build()
 
     # Access-control gate — runs before every other handler (group -1).
     # Only registered when at least one allow-list is non-empty so there is

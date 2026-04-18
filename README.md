@@ -52,6 +52,7 @@ A Telegram bot that saves recipes from any URL, searches them with AI-powered se
 | Bot framework | python-telegram-bot 22.7 (polling) |
 | AI extraction | Claude Agent SDK 0.1.58 |
 | Embeddings | sentence-transformers (paraphrase-multilingual-mpnet-base-v2, 768-dim) |
+| Tensor backend | PyTorch 2.11.0 (CPU-only build via `pytorch-cpu` uv index) |
 | ORM | SQLModel 0.0.38 (SQLAlchemy + Pydantic) |
 | Database | PostgreSQL 18 + pgvector 0.4.2 |
 | Migrations | Alembic 1.18.4 |
@@ -103,7 +104,7 @@ All configuration is loaded from environment variables (or `.env`). See [.env.ex
 | Variable | Description |
 |----------|-------------|
 | `TELEGRAM_BOT_TOKEN` | Bot token from @BotFather |
-| `ANTHROPIC_API_KEY` | Anthropic API key (read directly by the Claude SDK). When unset, the entrypoint falls back to Claude Code credentials mounted from `~/.claude/.credentials.json` on the host (see `docker-compose.yml`). |
+| `ANTHROPIC_API_KEY` | Anthropic API key (read directly by the Claude SDK). When unset, the entrypoint falls back to the Claude Code credentials file pointed to by `CLAUDE_CREDENTIALS_FILE`. |
 
 ### Database (set automatically by Docker Compose)
 
@@ -119,6 +120,8 @@ All configuration is loaded from environment variables (or `.env`). See [.env.ex
 
 | Variable | Default | Description |
 |----------|---------|-------------|
+| `CLAUDE_CREDENTIALS_FILE` | `/dev/null` | Host path to a Claude Code `.credentials.json`, bind-mounted into the container as a fallback when `ANTHROPIC_API_KEY` is empty (e.g. `${HOME}/.claude/.credentials.json`) |
+| `HF_TOKEN` | `""` | Hugging Face Hub token — enables higher rate limits and faster model downloads |
 | `EMBEDDING_MODEL_NAME` | `sentence-transformers/paraphrase-multilingual-mpnet-base-v2` | HuggingFace model for title embeddings |
 | `SEARCH_DISTANCE_THRESHOLD` | `0.65` | Cosine similarity minimum (0.0 = permissive, 1.0 = exact) |
 | `SEARCH_RESULT_LIMIT` | `5` | Maximum recipes returned per search |
@@ -143,6 +146,8 @@ When all three access-control lists are empty, the bot is open to everyone.
 | `/annuler` | Cancel the current conversation |
 
 Arguments shown in brackets are optional at invocation time — if omitted, the bot prompts the user for them in a follow-up message.
+
+The bot registers these commands with Telegram on startup (for both private and group chats), so they appear in the `/` autocomplete menu automatically.
 
 ---
 
@@ -197,7 +202,7 @@ uv run ty check
 The default `docker-compose.yml` defines two services:
 
 - **db** — `pgvector/pgvector:0.8.2-pg18-trixie` with a persistent volume and health checks.
-- **bot** — multi-stage build (uv builder + slim Python runtime), runs as unprivileged `app` user. The sentence-transformers model cache is persisted via a Docker volume.
+- **bot** — multi-stage build (uv builder + slim Python runtime), runs as unprivileged `app` user. Uses CPU-only PyTorch wheels to keep the runtime image small; the sentence-transformers model cache is persisted via a Docker volume.
 
 ```bash
 docker compose up -d --build

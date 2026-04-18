@@ -11,9 +11,15 @@ to ``FakeUpdate`` so the ``isinstance(update, Update)`` check inside
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from typing import Any
+from unittest.mock import AsyncMock
 
 import pytest
 from sqlalchemy.exc import OperationalError as SAOperationalError
+from telegram import (
+    BotCommand,
+    BotCommandScopeAllGroupChats,
+    BotCommandScopeAllPrivateChats,
+)
 from telegram.error import NetworkError as TelegramNetworkError
 from telegram.ext import (
     ApplicationHandlerStop,
@@ -1703,3 +1709,41 @@ def test_build_application_with_access_control_registers_gate(
     app = bot.build_application()
     group_minus_1 = app.handlers.get(-1, [])
     assert any(isinstance(h, TypeHandler) for h in group_minus_1)
+
+
+# --- command menu registration --------------------------------------------
+
+
+def test_build_application_wires_post_init_for_command_menu() -> None:
+    """The Application must invoke ``_post_init`` on startup so the command
+    menu is pushed to Telegram before polling begins."""
+    app = bot.build_application()
+    assert app.post_init is bot._post_init
+
+
+async def test_post_init_sets_commands_for_private_and_group_scopes() -> None:
+    """``_post_init`` must register the full command list under both the
+    private-chat scope and the group-chat scope so the menu appears everywhere
+    the bot is used."""
+    application = AsyncMock()
+    application.bot = AsyncMock()
+
+    await bot._post_init(application)
+
+    assert application.bot.set_my_commands.await_count == 2
+    calls = application.bot.set_my_commands.await_args_list
+
+    scopes = {type(call.kwargs["scope"]) for call in calls}
+    assert scopes == {BotCommandScopeAllPrivateChats, BotCommandScopeAllGroupChats}
+
+    for call in calls:
+        commands = call.args[0]
+        assert all(isinstance(c, BotCommand) for c in commands)
+        assert [c.command for c in commands] == [
+            "ajouter",
+            "chercher",
+            "personnes",
+            "courses",
+            "annuler",
+        ]
+        assert all(c.description.strip() for c in commands)
