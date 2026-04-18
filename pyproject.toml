@@ -1,6 +1,6 @@
 [project]
 name = "recettesbot"
-version = "0.2.0"
+version = "0.2.1"
 description = "RecettesBot est un bot Telegram qui permet aux d'enregistrer des recettes à partir de n'importe quelle URL, de les rechercher par titre grâce à la recherche vectorielle, d'exporter les recettes au format PDF, d'ajuster le nombre de portions et de générer une liste de courses via un sondage interactif."
 authors = [
     { name = "j-about", email = "142051449+j-about@users.noreply.github.com" }
