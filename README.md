@@ -17,7 +17,7 @@ A Telegram bot that saves recipes from any URL, searches them with AI-powered se
 - **PDF export** — generate clean A4 recipe cards with DejaVu Sans for full Unicode support.
 - **Servings adjustment** — scale ingredient quantities to any number of servings.
 - **Shopping list** — generate an interactive Telegram poll from a recipe's ingredients.
-- **Access control** — optionally restrict the bot to specific Telegram users, groups, or channels.
+- **Access control** — optionally restrict the bot to specific Telegram users or groups.
 - **Observability** — optional Logfire (Pydantic) tracing across all handlers.
 
 ---
@@ -131,9 +131,8 @@ All configuration is loaded from environment variables (or `.env`). See [.env.ex
 | `LOGFIRE_TOKEN` | `""` | Pydantic Logfire token (leave empty to disable) |
 | `ALLOWED_USER_IDS` | `""` | Comma-separated Telegram user IDs |
 | `ALLOWED_GROUP_IDS` | `""` | Comma-separated Telegram group IDs |
-| `ALLOWED_CHANNEL_IDS` | `""` | Comma-separated Telegram channel IDs |
 
-When all three access-control lists are empty, the bot is open to everyone.
+When both access-control lists are empty, the bot is open to everyone.
 
 ---
 

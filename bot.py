@@ -16,7 +16,7 @@ Additional infrastructure:
 - Rich error handler categorising network, agent, embedding, PDF, database,
   and unknown errors — never exposes stack traces to the user.
 - Optional access-control gate (handler group ``-1``) restricting usage to
-  configured user / group / channel allow-lists.
+  configured user / group allow-lists.
 - Logfire observability spans for every handler.
 - Polling-only entry point; webhook mode is not supported.
 """
@@ -871,8 +871,6 @@ async def _access_control_gate(update: Update, context: ContextTypes.DEFAULT_TYP
     if user_id is not None and user_id in settings.allowed_user_id_set:
         return
     if chat_id is not None and chat_id in settings.allowed_group_id_set:
-        return
-    if chat_id is not None and chat_id in settings.allowed_channel_id_set:
         return
 
     logger.debug("Access denied for user_id=%s chat_id=%s", user_id, chat_id)

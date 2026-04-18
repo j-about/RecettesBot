@@ -20,7 +20,6 @@ OPTIONAL_DEFAULTS = {
     "LOGFIRE_TOKEN",
     "ALLOWED_USER_IDS",
     "ALLOWED_GROUP_IDS",
-    "ALLOWED_CHANNEL_IDS",
 }
 
 
@@ -54,7 +53,6 @@ def test_settings_loads_from_env(isolated_env: pytest.MonkeyPatch) -> None:
     assert s.logfire_token == ""
     assert s.allowed_user_ids == ""
     assert s.allowed_group_ids == ""
-    assert s.allowed_channel_ids == ""
 
 
 def test_settings_missing_required_raises(isolated_env: pytest.MonkeyPatch) -> None:
@@ -82,10 +80,8 @@ def test_allowed_ids_default_empty(isolated_env: pytest.MonkeyPatch) -> None:
     s = _make_settings(isolated_env)
     assert s.allowed_user_ids == ""
     assert s.allowed_group_ids == ""
-    assert s.allowed_channel_ids == ""
     assert s.allowed_user_id_set == frozenset()
     assert s.allowed_group_id_set == frozenset()
-    assert s.allowed_channel_id_set == frozenset()
 
 
 def test_allowed_ids_parse_comma_separated(isolated_env: pytest.MonkeyPatch) -> None:
@@ -114,9 +110,9 @@ def test_allowed_ids_invalid_raises(isolated_env: pytest.MonkeyPatch) -> None:
 
 
 def test_allowed_ids_negative_ids(isolated_env: pytest.MonkeyPatch) -> None:
-    """Channel IDs in Telegram are negative (e.g. -1001234567890)."""
-    s = _make_settings(isolated_env, ALLOWED_CHANNEL_IDS="-1001234567890,-1009876543210")
-    assert s.allowed_channel_id_set == frozenset({-1001234567890, -1009876543210})
+    """Supergroup IDs in Telegram are negative (e.g. -1001234567890)."""
+    s = _make_settings(isolated_env, ALLOWED_GROUP_IDS="-1001234567890,-1009876543210")
+    assert s.allowed_group_id_set == frozenset({-1001234567890, -1009876543210})
 
 
 def test_has_access_control_false_when_empty(isolated_env: pytest.MonkeyPatch) -> None:

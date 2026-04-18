@@ -36,7 +36,6 @@ services:
       LOGFIRE_TOKEN: ${LOGFIRE_TOKEN:-}
       ALLOWED_USER_IDS: ${ALLOWED_USER_IDS:-}
       ALLOWED_GROUP_IDS: ${ALLOWED_GROUP_IDS:-}
-      ALLOWED_CHANNEL_IDS: ${ALLOWED_CHANNEL_IDS:-}
       LOGFIRE_IGNORE_NO_CONFIG: "1"
     volumes:
       - hf_cache:/opt/hf-cache

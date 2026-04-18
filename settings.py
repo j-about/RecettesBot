@@ -3,8 +3,9 @@
 Provides a :class:`Settings` Pydantic model that validates and exposes all
 configuration — Telegram credentials, database URLs, embedding model name,
 search tuning parameters, agent timeout, Logfire token, and optional
-access-control allow-lists. The singleton is accessed via :func:`get_settings`,
-which caches the instance for the lifetime of the process.
+access-control allow-lists for users and groups. The singleton is accessed
+via :func:`get_settings`, which caches the instance for the lifetime of the
+process.
 """
 
 from functools import cached_property, lru_cache
@@ -47,17 +48,16 @@ class Settings(BaseSettings):
     # Logfire
     logfire_token: str = ""
 
-    # Access control — restrict the bot to specific Telegram users, groups,
-    # or channels.  Each variable accepts a comma-separated list of integer
-    # IDs.  When all three are empty the bot is open to everyone.
+    # Access control — restrict the bot to specific Telegram users or groups.
+    # Each variable accepts a comma-separated list of integer IDs.  When both
+    # are empty the bot is open to everyone.
     # Stored as ``str`` because pydantic-settings attempts JSON decoding on
     # complex types *before* field validators run, which rejects plain
     # comma-separated values.
     allowed_user_ids: str = ""
     allowed_group_ids: str = ""
-    allowed_channel_ids: str = ""
 
-    @field_validator("allowed_user_ids", "allowed_group_ids", "allowed_channel_ids")
+    @field_validator("allowed_user_ids", "allowed_group_ids")
     @classmethod
     def _validate_comma_separated_ids(cls, value: str) -> str:
         if not value.strip():
@@ -84,18 +84,12 @@ class Settings(BaseSettings):
         """Parsed set of allowed Telegram group IDs."""
         return self._parse_id_list(self.allowed_group_ids)
 
-    @cached_property
-    def allowed_channel_id_set(self) -> frozenset[int]:
-        """Parsed set of allowed Telegram channel IDs."""
-        return self._parse_id_list(self.allowed_channel_ids)
-
     @property
     def has_access_control(self) -> bool:
         """Return ``True`` when at least one allow-list is non-empty."""
         return bool(
             self.allowed_user_ids.strip()
             or self.allowed_group_ids.strip()
-            or self.allowed_channel_ids.strip()
         )
 
 

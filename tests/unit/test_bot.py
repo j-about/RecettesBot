@@ -1600,12 +1600,10 @@ def _patch_access_control(
     *,
     user_ids: frozenset[int] = frozenset(),
     group_ids: frozenset[int] = frozenset(),
-    channel_ids: frozenset[int] = frozenset(),
 ) -> None:
     """Override access-control settings for a single test."""
     monkeypatch.setenv("ALLOWED_USER_IDS", ",".join(str(i) for i in user_ids))
     monkeypatch.setenv("ALLOWED_GROUP_IDS", ",".join(str(i) for i in group_ids))
-    monkeypatch.setenv("ALLOWED_CHANNEL_IDS", ",".join(str(i) for i in channel_ids))
     get_settings.cache_clear()
 
 
@@ -1649,19 +1647,6 @@ async def test_access_gate_allows_authorized_group(
     update = FakeUpdate(
         effective_user=FakeUser(id=42),
         effective_chat=FakeChat(id=-100123),
-    )
-    ctx = FakeContext()
-    await bot._access_control_gate(update, ctx)  # type: ignore[arg-type]
-
-
-@pytest.mark.asyncio
-async def test_access_gate_allows_authorized_channel(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    _patch_access_control(monkeypatch, channel_ids=frozenset({-1001234567890}))
-    update = FakeUpdate(
-        effective_user=None,
-        effective_chat=FakeChat(id=-1001234567890),
     )
     ctx = FakeContext()
     await bot._access_control_gate(update, ctx)  # type: ignore[arg-type]
