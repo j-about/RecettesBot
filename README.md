@@ -106,7 +106,7 @@ All configuration is loaded from environment variables (or `.env`). See [.env.ex
 | Variable | Description |
 |----------|-------------|
 | `TELEGRAM_BOT_TOKEN` | Bot token from @BotFather |
-| `ANTHROPIC_API_KEY` | Anthropic API key (read directly by the Claude SDK). When unset, the entrypoint falls back to the Claude Code credentials file pointed to by `CLAUDE_CREDENTIALS_FILE`. |
+| `ANTHROPIC_API_KEY` | Anthropic API key (read directly by the Claude SDK). When unset, the entrypoint falls through to `CLAUDE_CODE_OAUTH_TOKEN` and finally to the Claude Code credentials file pointed to by `CLAUDE_CREDENTIALS_FILE`. |
 
 ### Database (set automatically by Docker Compose)
 
@@ -122,7 +122,8 @@ All configuration is loaded from environment variables (or `.env`). See [.env.ex
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CLAUDE_CREDENTIALS_FILE` | `/dev/null` | Host path to a Claude Code `.credentials.json`, bind-mounted into the container as a fallback when `ANTHROPIC_API_KEY` is empty (e.g. `${HOME}/.claude/.credentials.json`) |
+| `CLAUDE_CODE_OAUTH_TOKEN` | `""` | OAuth token for the Claude CLI (from `claude setup-token`); used when `ANTHROPIC_API_KEY` is empty, before the credentials-file fallback. |
+| `CLAUDE_CREDENTIALS_FILE` | `/dev/null` | Host path to a Claude Code `.credentials.json`, bind-mounted into the container as a last-resort fallback when both `ANTHROPIC_API_KEY` and `CLAUDE_CODE_OAUTH_TOKEN` are empty (e.g. `${HOME}/.claude/.credentials.json`) |
 | `HF_TOKEN` | `""` | Hugging Face Hub token — enables higher rate limits and faster model downloads |
 | `EMBEDDING_MODEL_NAME` | `sentence-transformers/paraphrase-multilingual-mpnet-base-v2` | HuggingFace model for title embeddings |
 | `SEARCH_DISTANCE_THRESHOLD` | `0.65` | Cosine similarity minimum (0.0 = permissive, 1.0 = exact) |
@@ -162,7 +163,8 @@ uv sync
 
 # Set up environment variables
 cp .env.example .env
-# Fill in TELEGRAM_BOT_TOKEN, ANTHROPIC_API_KEY, DATABASE_URL, DATABASE_URL_SYNC
+# Fill in TELEGRAM_BOT_TOKEN, DATABASE_URL, DATABASE_URL_SYNC, and either
+# ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN
 ```
 
 ### Running tests

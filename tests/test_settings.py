@@ -29,7 +29,13 @@ def isolated_env(monkeypatch: pytest.MonkeyPatch) -> pytest.MonkeyPatch:
 
     Also disables `.env` file loading so a developer's local file cannot leak in.
     """
-    all_keys = {*REQUIRED_ENV, *DATABASE_ENV, *OPTIONAL_DEFAULTS, "ANTHROPIC_API_KEY"}
+    all_keys = {
+        *REQUIRED_ENV,
+        *DATABASE_ENV,
+        *OPTIONAL_DEFAULTS,
+        "ANTHROPIC_API_KEY",
+        "CLAUDE_CODE_OAUTH_TOKEN",
+    }
     for key in all_keys:
         monkeypatch.delenv(key, raising=False)
     monkeypatch.setattr(Settings, "model_config", {"env_file": None})

@@ -1,9 +1,13 @@
 #!/bin/sh
 set -e
 
-# Unset empty ANTHROPIC_API_KEY so the Claude SDK falls back to credentials file.
+# Unset empty auth env vars so the Claude CLI falls through the auth chain:
+#   ANTHROPIC_API_KEY -> CLAUDE_CODE_OAUTH_TOKEN -> ~/.claude/.credentials.json
 if [ -z "$ANTHROPIC_API_KEY" ]; then
     unset ANTHROPIC_API_KEY
+fi
+if [ -z "$CLAUDE_CODE_OAUTH_TOKEN" ]; then
+    unset CLAUDE_CODE_OAUTH_TOKEN
 fi
 
 # Copy Claude credentials if mounted (bind mount may have wrong ownership).

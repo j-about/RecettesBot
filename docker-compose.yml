@@ -26,6 +26,7 @@ services:
     environment:
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      CLAUDE_CODE_OAUTH_TOKEN: ${CLAUDE_CODE_OAUTH_TOKEN:-}
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       DATABASE_URL_SYNC: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       HF_TOKEN: ${HF_TOKEN:-}
@@ -39,11 +40,12 @@ services:
       LOGFIRE_IGNORE_NO_CONFIG: "1"
     volumes:
       - hf_cache:/opt/hf-cache
-      # Optional Claude Code credentials, used as a fallback when
-      # ANTHROPIC_API_KEY is empty. Set CLAUDE_CREDENTIALS_FILE in your .env to
-      # the host path of your ~/.claude/.credentials.json. When unset, the
-      # default /dev/null is mounted; entrypoint.sh's regular-file check skips
-      # the copy and the Claude Agent SDK relies on ANTHROPIC_API_KEY.
+      # Optional Claude Code credentials, used as the last-resort fallback when
+      # both ANTHROPIC_API_KEY and CLAUDE_CODE_OAUTH_TOKEN are empty. Set
+      # CLAUDE_CREDENTIALS_FILE in your .env to the host path of your
+      # ~/.claude/.credentials.json. When unset, the default /dev/null is
+      # mounted; entrypoint.sh's regular-file check skips the copy and the
+      # Claude Agent SDK relies on whichever of the two env vars is populated.
       - ${CLAUDE_CREDENTIALS_FILE:-/dev/null}:/mnt/claude-credentials/.credentials.json:ro
     restart: unless-stopped
 

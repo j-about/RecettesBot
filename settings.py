@@ -18,9 +18,10 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
-        # ANTHROPIC_API_KEY (read directly by the Claude SDK from os.environ) is
-        # documented in .env.example and lives in .env, so the .env loader sees
-        # it. Ignore unknown keys instead of failing on every load.
+        # ANTHROPIC_API_KEY and CLAUDE_CODE_OAUTH_TOKEN (both read directly by
+        # the Claude SDK from os.environ) are documented in .env.example and
+        # live in .env, so the .env loader sees them. Ignore unknown keys
+        # instead of failing on every load.
         extra="ignore",
     )
 
@@ -32,8 +33,9 @@ class Settings(BaseSettings):
     database_url_sync: str
 
     # Claude Agent SDK
-    # The SDK reads ANTHROPIC_API_KEY from the environment automatically.
-    # No explicit field needed here, but documented for clarity.
+    # The SDK reads ANTHROPIC_API_KEY and CLAUDE_CODE_OAUTH_TOKEN from the
+    # environment automatically. No explicit fields needed here, but
+    # documented for clarity.
 
     # Sentence Transformers
     embedding_model_name: str = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
