@@ -50,7 +50,7 @@ A Telegram bot that saves recipes from any URL, searches them with AI-powered se
 | Layer | Technology |
 |-------|-----------|
 | Bot framework | python-telegram-bot 22.7 (polling) |
-| AI extraction | Claude Agent SDK 0.1.64 |
+| AI extraction | Claude Agent SDK 0.1.64 (model: `haiku`) |
 | Embeddings | sentence-transformers 5.4.1 (paraphrase-multilingual-mpnet-base-v2, 768-dim) |
 | Tensor backend | PyTorch 2.11.0 (CPU-only build via `pytorch-cpu` uv index) |
 | ORM | SQLModel 0.0.38 (SQLAlchemy + Pydantic) |

@@ -177,6 +177,7 @@ async def extract_recipe(url: str) -> RecipeOutput:
         system_prompt=RECIPE_SYSTEM_PROMPT,
         allowed_tools=["WebFetch"],
         permission_mode="acceptEdits",
+        model="haiku",
         # Constrain Claude's response to the RecipeOutput shape via the
         # CLI's json_schema mode. The SDK forwards this to the Messages API
         # as the structured-output contract.
