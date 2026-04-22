@@ -4,4 +4,4 @@
   become: true
 
   roles:
-    - role: rb_deployment
+    - role: recettesbot_deployment
